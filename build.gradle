@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.0'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+def allureVersion = "2.24.0"
+def aspectJVersion = "1.9.20.1"
+
+configurations {
+    agent {
+        canBeResolved = true
+        canBeConsumed = true
+    }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.12.1'
+    implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '5.6.2'
+    implementation 'io.rest-assured:rest-assured:5.3.2'
+    implementation group: 'io.cucumber', name: 'cucumber-java', version: '7.13.0'
+    testImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '7.13.0'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.9'
+
+    agent "org.aspectj:aspectjweaver:$aspectJVersion"
+
+    testImplementation platform("io.qameta.allure:allure-bom:$allureVersion")
+    testImplementation "io.qameta.allure:allure-selenide"
+    implementation 'io.qameta.allure:allure-selenide:2.24.0'
+    testImplementation "io.qameta.allure:allure-cucumber7-jvm"
+    implementation 'io.qameta.allure:allure-commandline:2.24.0'
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.7.2"
+
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'allure.results.directory', buildDir.absolutePath + '/allure-results'
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    jvmArgs = [ "-javaagent:${configurations.agent.singleFile}" ]
+}
+
+allure {
+    version = "2.21.0"
+}
